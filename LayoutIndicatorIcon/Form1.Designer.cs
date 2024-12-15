@@ -19,12 +19,11 @@ namespace LayoutIndicatorIcon
         }
         private void InitializeComponent()
         {
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.SuspendLayout();
             // 
             // notifyIcon
             // 
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon();
             this.notifyIcon.Icon = Resources.appIcon; // Replace with your app icon
             this.notifyIcon.Text = "Layout Indicator Icon"; // Tooltip text
             this.notifyIcon.Visible = true; // Make the icon visible
@@ -33,6 +32,7 @@ namespace LayoutIndicatorIcon
             // 
             // pictureBox1
             // 
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(32, 32); // Set the icon size
@@ -60,7 +60,29 @@ namespace LayoutIndicatorIcon
         {
             var contextMenu = new ContextMenuStrip();
             var exitItem = new ToolStripMenuItem("Exit");
+            var cursorIconItem = new ToolStripMenuItem("Cursor Icon") { Checked = false }; // Initially checked
+            var typingPositionItem = new ToolStripMenuItem("Typing Position") { Checked = true }; // Default: Off
+
+            // Exit menu item
             exitItem.Click += (s, e) => Application.Exit();
+
+            // Toggle cursor icon visibility
+            cursorIconItem.Click += (s, e) =>
+            {
+                cursorIconItem.Checked = !cursorIconItem.Checked; // Toggle checked state
+                pictureBox1.Visible = cursorIconItem.Checked;     // Show or hide the picture box
+            };
+            
+            // Toggle placement mode (Typing vs Cursor Position)
+            typingPositionItem.Click += (s, e) =>
+            {
+                typingPositionItem.Checked = !typingPositionItem.Checked; // Toggle checked state
+                UpdatePlacementMode(typingPositionItem.Checked);          // Change placement mode
+            };
+
+            // Add items to the context menu
+            contextMenu.Items.Add(cursorIconItem);
+            contextMenu.Items.Add(typingPositionItem);
             contextMenu.Items.Add(exitItem);
             return contextMenu;
         }

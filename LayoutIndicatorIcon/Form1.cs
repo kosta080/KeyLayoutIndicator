@@ -35,31 +35,57 @@ namespace LayoutIndicatorIcon
         {
             // Update input language and position
             UpdatePosition();
-            
+    
             string inputLanguage = NativeMethods.GetCurrentInputLanguage();
             if (inputLanguage == null) return;
+
+            Console.WriteLine($"Updating Icon for Language: {inputLanguage}");
             UpdateIcon(inputLanguage);
         }
 
         private void UpdateIcon(string inputLanguage)
         {
-            if (inputLanguage.Contains("English"))
-                pictureBox1.Image = Resources.enIcon; // Replace with your icon
-            else if (inputLanguage.Contains("Russian"))
+            if (inputLanguage.IndexOf("English", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                pictureBox1.Image = Resources.enIcon;
+            }
+            else if (inputLanguage.IndexOf("Russian", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
                 pictureBox1.Image = Resources.ruIcon;
-            else if (inputLanguage.Contains("Hebrew"))
+            }
+            else if (inputLanguage.IndexOf("Hebrew", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
                 pictureBox1.Image = Resources.heIcon;
+            }
             else
-                pictureBox1.Image = Resources.heIcon;
+            {
+                Console.WriteLine($"Unknown language: {inputLanguage}, setting default icon.");
+                pictureBox1.Image = Resources.heIcon; // Default icon
+            }
         }
         
+        private bool useTypingPosition = true;
+        private void UpdatePlacementMode(bool typingPosition)
+        {
+            useTypingPosition = typingPosition;
+            
+        }
         private void UpdatePosition()
         {
-            // Get the current cursor position
-            NativeMethods.POINT cursorPosition = NativeMethods.GetCursorPosition();
+            Point position;
+            if (useTypingPosition)
+            {
+                // Get the typing (caret) position
+                position = NativeMethods.GetCaretPosition();
+            }
+            else
+            {
+                // Get the cursor position
+                position = NativeMethods.GetCursorPosition();
+            }
 
             // Offset the form to appear near the cursor
-            this.Location = new Point(cursorPosition.X + 10, cursorPosition.Y + 10);
+            this.Location = new Point(position.X + 10, position.Y + 10);
         }
 
         private void PositionOverlay(NativeMethods.POINT caretPosition)
@@ -74,9 +100,10 @@ namespace LayoutIndicatorIcon
 
             if (m.Msg == WM_INPUTLANGCHANGE)
             {
-                // Handle language change
                 string inputLanguage = NativeMethods.GetCurrentInputLanguage();
                 if (inputLanguage == null) return;
+
+                Console.WriteLine($"Language Changed to: {inputLanguage}");
                 UpdateIcon(inputLanguage);
             }
 
